@@ -1,0 +1,21 @@
+# Core dependencies
+pyautogui
+Pillow
+opencv-python
+numpy
+screeninfo
+openai
+icecream
+pyperclip
+pynput
+tkinter
+
+# Voice input dependencies
+sounddevice
+git+https://github.com/openai/whisper.git
+torch
+torchvision
+torchaudio
+
+# Optional dependencies for additional features
+python-dotenv

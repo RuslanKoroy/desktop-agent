@@ -1,0 +1,5 @@
+Screen dimensions: 1920x1080
+Grid: 20 rows x 35 columns
+Cell size: 54x54 pixels
+Total cells: 700
+Cursor position: (621, 459) in cell 292
