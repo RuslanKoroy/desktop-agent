@@ -153,26 +153,6 @@ def update_position_info():
             _last_screen_dimensions = get_screen_dimensions()
         time.sleep(0.05)  # Обновление 20 раз в секунду
 
-def update_screenshots():
-    while agent_running:
-        save_screenshot()
-        time.sleep(0.2)  # Частота 5 раз в секунду
-
-def command_processor_thread():
-    """Поток для обработки команд из очереди"""
-    while agent_running:
-        if not _command_results_queue.empty():
-            item = _command_results_queue.get()
-            if item is None:  # Сигнал остановки
-                break
-            commands, callback = item
-            update_agent_status("Выполнение команд")
-            results = process_commands(commands)
-            callback(results)
-            _command_results_queue.task_done()
-        else:
-            time.sleep(0.01)  # Короткий сон для снижения нагрузки на CPU
-
 def run_desktop_agent(task, max_iterations=15, use_voice=True, voice_model="tiny", voice_language="ru"):
     global _last_cursor_position, _last_screen_dimensions, agent_running
 
@@ -208,20 +188,8 @@ def run_desktop_agent(task, max_iterations=15, use_voice=True, voice_model="tiny
     press_hotkey('win', 'd')
     time.sleep(2)
     save_screenshot()
-    
-    cmd_processor = threading.Thread(target=command_processor_thread, daemon=True)
-    cmd_processor.start()
-    
+
     conversion_threads = []
-    
-    # Событие для ожидания завершения выполнения команд
-    cmd_feedback_event = threading.Event()
-    command_results = []
-    
-    def command_callback(results):
-        nonlocal command_results
-        command_results = results
-        cmd_feedback_event.set()
     
     # Функция для обработки голосового ввода
     def process_voice_input():
@@ -233,8 +201,6 @@ def run_desktop_agent(task, max_iterations=15, use_voice=True, voice_model="tiny
                 print("Идет распознавание речи...")
                 return None
                 
-            # Уменьшаем время ожидания до 0.5 секунд 
-            # для более частых проверок транскрипций
             poll_start = time.time()
             while time.time() - poll_start < 0.5:
                 transcriptions = voice_processor.get_all_transcriptions()
@@ -262,7 +228,6 @@ def run_desktop_agent(task, max_iterations=15, use_voice=True, voice_model="tiny
                             
                             set_listening(False)
                             return voice_feedback
-                # Более частые проверки
                 time.sleep(0.05)
         return voice_feedback
 
@@ -363,7 +328,6 @@ def run_desktop_agent(task, max_iterations=15, use_voice=True, voice_model="tiny
             if commands:
                 print("\nВыполнение команд:")
                 update_agent_status("Выполнение команд")
-                cmd_feedback_event.clear()
                 command_results = process_commands(commands)
 
                 results_text = "Результаты выполнения команд:\n"
@@ -398,9 +362,6 @@ def run_desktop_agent(task, max_iterations=15, use_voice=True, voice_model="tiny
         agent_running = False
         if voice_processor:
             voice_processor.stop()
-        _command_results_queue.put(None)
-        if cmd_processor.is_alive():
-            cmd_processor.join(timeout=1.0)
         print("Агент остановлен.")
 
 if __name__ == "__main__":

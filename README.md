@@ -21,7 +21,7 @@ A powerful desktop automation tool that allows AI models to control your compute
 
 1. Clone this repository:
    ```
-   git clone https://github.com/RuslanKoroy/desktop-agent.git
+   git clone https://github.com/yourusername/desktop-agent.git
    cd desktop-agent
    ```
 
@@ -97,6 +97,7 @@ The AI can issue various commands to control your computer:
 
 You can extend the functionality by:
 
-1. Customizing the prompt in `prompts/default.md`
-2. Adding new command types in `services/execute_funcs.py`
-3. Enhancing voice processing in `services/voice_input.py`
+1. Adding new command types in `services/execute_funcs.py`
+2. Implementing new UI element detection in `services/cursor.py`
+3. Customizing the prompt in `prompts/default.md`
+4. Enhancing voice processing in `services/voice_input.py`
